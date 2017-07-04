@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h4>Race is - {{ race.name }}</h4>
+    <table class="table table-condensed table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Horse Name</th>
+                <th>WilliamHill</th>
+                <th>PaddyPower</th>
+                <th>bet365</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for horse in horses %}
+            <tr>
+                <td>{{ horse.name }}</td>
+                <td>{{ horse.williamhillbet__odd }}/{{ horse.williamhillbet__probability }}</td>
+                <td>{{ horse.paddypowerbet__odd }}/{{ horse.paddypowerbet__probability }}</td>
+                <td>{{ horse.bet365bet__odd }}/{{ horse.bet365bet__probability }}</td>
+
+            </tr>
+        {% endfor %}
+        </tbody>
+{% endblock %}
+{% block js %}
+    <script type="application/javascript">
+        $(document).ready(function () {
+
+        });
+    </script>
+{% endblock %}
