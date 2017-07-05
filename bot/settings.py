@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'prettyjson',
 
     'channels',
+    'django_cron',
 
     'scraper',
     'index',
