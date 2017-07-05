@@ -34,26 +34,27 @@ class Command(BaseCommand):
         url = race.paddy_power_data['url'].format(
             event_id=race.paddy_power_data.get('event_id')
         )
-        response = requests.get(url)
-        parameters = re.findall(r'\(\s*({[^)]+?})\s*\)', response.text)[0]
-        race_regexp = r'(\[.*?\])'
-        races_data = re.findall(race_regexp, parameters)
-        horses = json.loads(races_data[0])
         horse_in_race__ids = []
-        for horse_in_race in horses:
-            horse_name = horse_in_race['horse_names'].get('en')
-            if horse_name is None:
-                continue
-            horse, _ = Horse.objects.get_or_create(name=horse_name)
-            _, _ = PaddyPowerBet.objects.update_or_create(
-                race=race,
-                horse=horse,
-                defaults={
-                    'odd': horse_in_race.get('lp_num'),
-                    'probability': horse_in_race.get('has_rp'),
-                }
-            )
-            horse_in_race__ids.append(horse.id)
+        response = requests.get(url)
+        if response.status_code == 200:
+            parameters = re.findall(r'\(\s*({[^)]+?})\s*\)', response.text)[0]
+            race_regexp = r'(\[.*?\])'
+            races_data = re.findall(race_regexp, parameters)
+            horses = json.loads(races_data[0])
+            for horse_in_race in horses:
+                horse_name = horse_in_race['horse_names'].get('en')
+                if horse_name is None:
+                    continue
+                horse, _ = Horse.objects.get_or_create(name=horse_name)
+                _, _ = PaddyPowerBet.objects.update_or_create(
+                    race=race,
+                    horse=horse,
+                    defaults={
+                        'odd': horse_in_race.get('lp_num'),
+                        'probability': horse_in_race.get('has_rp'),
+                    }
+                )
+                horse_in_race__ids.append(horse.id)
 
         for horse in PaddyPowerBet.objects.filter(race=race).exclude(horse__id__in=horse_in_race__ids):
             horse.deactivate_adds()

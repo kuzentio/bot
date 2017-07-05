@@ -54,26 +54,27 @@ class Command(BaseCommand):
             template_name=template_name,
             event_id=event_id,
         ))
-        soup = BeautifulSoup(response.text, 'html.parser')
-        rows = soup.find("table").find("tbody").find_all("tr")
         horse_in_race__ids = []
-        for num, row in enumerate(rows):
-            if num == 0:
-                continue
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, 'html.parser')
+            rows = soup.find("table").find("tbody").find_all("tr")
+            for num, row in enumerate(rows):
+                if num == 0:
+                    continue
 
-            horse_name = get_horse_name_from_row(row)
-            odd, probability = get_horse_odd_from_row(row)
+                horse_name = get_horse_name_from_row(row)
+                odd, probability = get_horse_odd_from_row(row)
 
-            horse, _ = Horse.objects.get_or_create(name=horse_name)
-            _, _ = WilliamHillBet.objects.update_or_create(
-                race=race,
-                horse=horse,
-                defaults={
-                    'odd': odd,
-                    'probability': probability,
-                }
-            )
-            horse_in_race__ids.append(horse.id)
+                horse, _ = Horse.objects.get_or_create(name=horse_name)
+                _, _ = WilliamHillBet.objects.update_or_create(
+                    race=race,
+                    horse=horse,
+                    defaults={
+                        'odd': odd,
+                        'probability': probability,
+                    }
+                )
+                horse_in_race__ids.append(horse.id)
         for horse in WilliamHillBet.objects.filter(race=race).exclude(horse__id__in=horse_in_race__ids):
             horse.deactivate_adds()
             horse.save()

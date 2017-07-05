@@ -52,24 +52,25 @@ class Command(BaseCommand):
 
         url = 'https://www.skybet.com/horse-racing/newmarket/event/20915135'
         response = requests.get(url)
-        soup = BeautifulSoup(response.text, 'html.parser')
-        trs = soup.findAll('tr', {"id": lambda x: x and x.startswith('horseDetailControl')})
         horse_in_race__ids = []
-        if not trs:
-            raise Exception("Remote service is unavailable.")
-        for tr in trs:
-            horse_name = execute_horse_name(tr)
-            odd, probability = execute_horse_odd(tr)
-            horse, _ = Horse.objects.get_or_create(name=horse_name)
-            _, _ = SkyBet.objects.update_or_create(
-                race=race,
-                horse=horse,
-                defaults={
-                    'odd': odd,
-                    'probability': probability,
-                }
-            )
-            horse_in_race__ids.append(horse.id)
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, 'html.parser')
+            trs = soup.findAll('tr', {"id": lambda x: x and x.startswith('horseDetailControl')})
+            if not trs:
+                logger.info("Remote service is unavailable.")
+            for tr in trs:
+                horse_name = execute_horse_name(tr)
+                odd, probability = execute_horse_odd(tr)
+                horse, _ = Horse.objects.get_or_create(name=horse_name)
+                _, _ = SkyBet.objects.update_or_create(
+                    race=race,
+                    horse=horse,
+                    defaults={
+                        'odd': odd,
+                        'probability': probability,
+                    }
+                )
+                horse_in_race__ids.append(horse.id)
         for horse in SkyBet.objects.filter(race=race).exclude(horse__id__in=horse_in_race__ids):
             horse.deactivate_adds()
             horse.save()
