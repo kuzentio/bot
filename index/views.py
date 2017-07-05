@@ -3,9 +3,10 @@ from django.shortcuts import render, get_object_or_404
 from scraper.models import Horse, Race
 
 
-def index(request, race_id):
+def index(request):
+    race_id = request.GET.get('race_id', 1)
     race = get_object_or_404(
-        Race, id=race_id
+        Race, id=race_id,
     )
     horses = Horse.objects.filter(
         races=race

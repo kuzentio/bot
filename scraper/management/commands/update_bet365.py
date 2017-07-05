@@ -39,4 +39,4 @@ class Command(BaseCommand):
         )
         response = requests.get(url)
         horses = [horse for horse in response.text.split('|') if 'OD' in horse]
-        # TODO: not closed issue because of technical maintain issue in bet365
+        # TODO: it is not complete, because of technical maintain issue in bet365.com
