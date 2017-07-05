@@ -46,18 +46,11 @@
     <script type="application/javascript">
         var socket = new WebSocket('ws://' + window.location.host + '/odds/');
 
-        socket.onopen = function open() {
-          console.log('WebSockets connection were created.');
-        };
-
         socket.onmessage = function message(event) {
             var data = JSON.parse(event.data);
             var odd_probability = ''+data.odd+'/'+data.probability+'';
             $(document.getElementById(data.uniid)).html(odd_probability);
         };
 
-        if (socket.readyState == WebSocket.OPEN) {
-          socket.onopen();
-        }
     </script>
 {% endblock %}
