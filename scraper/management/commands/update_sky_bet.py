@@ -20,7 +20,7 @@ def execute_horse_name(tr):
     horse_name_txt = tr.find('div', {'class': 'oc-horse'}).find('h4').text
     horse_name_list = re.sub(' +', ' ', horse_name_txt).split(' ')
     horse_name_clean_list = horse_name_list[1:len(horse_name_list) - 1]
-    horse_name = ''.join(horse_name_clean_list)
+    horse_name = ' '.join(horse_name_clean_list)
 
     return horse_name
 
@@ -62,6 +62,10 @@ class Command(BaseCommand):
                 horse_name = execute_horse_name(tr)
                 odd, probability = execute_horse_odd(tr)
                 horse, _ = Horse.objects.get_or_create(name=horse_name)
+
+                if not race.horses.filter(id=horse.id).exists():
+                    race.horses.add(horse)
+
                 _, _ = SkyBet.objects.update_or_create(
                     race=race,
                     horse=horse,

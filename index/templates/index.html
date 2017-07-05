@@ -9,7 +9,7 @@
                 <th>WilliamHill</th>
                 <th>PaddyPower</th>
                 <th>SkyBet</th>
-                <th>bet365</th>
+{#                <th>bet365</th>#}
             </tr>
         </thead>
         <tbody>
@@ -31,11 +31,11 @@
                         {{ horse.skybet__odd }}/{{ horse.skybet__probability }}
                     {% endif %}
                 </td>
-                <td id="{{ horse.bet365bet__uniid }}">
-                    {% if horse.bet365bet__odd %}
-                        {{ horse.bet365bet__odd }}/{{ horse.bet365bet__probability }}
-                    {% endif %}
-                </td>
+{#                <td id="{{ horse.bet365bet__uniid }}">#}
+{#                    {% if horse.bet365bet__odd %}#}
+{#                        {{ horse.bet365bet__odd }}/{{ horse.bet365bet__probability }}#}
+{#                    {% endif %}#}
+{#                </td>#}
             </tr>
         {% endfor %}
         </tbody>

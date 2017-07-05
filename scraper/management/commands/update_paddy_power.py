@@ -46,6 +46,10 @@ class Command(BaseCommand):
                 if horse_name is None:
                     continue
                 horse, _ = Horse.objects.get_or_create(name=horse_name)
+
+                if not race.horses.filter(id=horse.id).exists():
+                    race.horses.add(horse)
+
                 _, _ = PaddyPowerBet.objects.update_or_create(
                     race=race,
                     horse=horse,

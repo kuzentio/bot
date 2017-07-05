@@ -66,6 +66,10 @@ class Command(BaseCommand):
                 odd, probability = get_horse_odd_from_row(row)
 
                 horse, _ = Horse.objects.get_or_create(name=horse_name)
+
+                if not race.horses.filter(id=horse.id).exists():
+                    race.horses.add(horse)
+
                 _, _ = WilliamHillBet.objects.update_or_create(
                     race=race,
                     horse=horse,
