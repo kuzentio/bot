@@ -8,6 +8,7 @@ from scraper.models import Race, Horse, PaddyPowerBet, WilliamHillBet, Bet365Bet
 class ProviderAdmin(admin.ModelAdmin):
     list_display = ('horse', 'race', 'odd', 'probability', 'created', 'modified',)
     ordering = ('id', )
+    readonly_fields = ('uniid', )
 
 
 class RaceAdmin(admin.ModelAdmin):

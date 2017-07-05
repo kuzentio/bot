@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'django_extensions',
     'prettyjson',
 
+    'channels',
+
     'scraper',
     'index',
 ]
@@ -87,6 +89,16 @@ DATABASES = {
 }
 
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'asgi_redis.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('localhost', 6379)],
+        },
+        'ROUTING': 'bot.routing.channel_routing',
+    },
+}
+
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 
@@ -104,8 +116,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-if DEBUG:
-    AUTH_PASSWORD_VALIDATORS = []
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
@@ -127,3 +137,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+
+try:
+    from .local_settings import *
+except ImportError:
+    pass

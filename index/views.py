@@ -10,9 +10,10 @@ def index(request, race_id):
     horses = Horse.objects.filter(
         races=race
     ).values(
-        'name', 'paddypowerbet__odd', 'paddypowerbet__probability',
-        'name', 'williamhillbet__odd', 'williamhillbet__probability',
-        'name', 'bet365bet__odd', 'bet365bet__probability',
+        'name',
+        'paddypowerbet__uniid', 'paddypowerbet__odd', 'paddypowerbet__probability',
+        'williamhillbet__uniid', 'williamhillbet__odd', 'williamhillbet__probability',
+        'bet365bet__uniid', 'bet365bet__odd', 'bet365bet__probability',
     )
     context = {
         'horses': horses,

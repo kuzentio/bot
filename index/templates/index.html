@@ -15,18 +15,43 @@
         {% for horse in horses %}
             <tr>
                 <td>{{ horse.name }}</td>
-                <td>{{ horse.williamhillbet__odd }}/{{ horse.williamhillbet__probability }}</td>
-                <td>{{ horse.paddypowerbet__odd }}/{{ horse.paddypowerbet__probability }}</td>
-                <td>{{ horse.bet365bet__odd }}/{{ horse.bet365bet__probability }}</td>
-
+                <td id="{{ horse.williamhillbet__uniid }}">
+                    {% if horse.williamhillbet__odd %}
+                        {{ horse.williamhillbet__odd }}/{{ horse.williamhillbet__probability }}
+                    {% endif %}
+                </td>
+                <td id="{{ horse.paddypowerbet__uniid }}">
+                    {% if horse.paddypowerbet__odd %}
+                        {{ horse.paddypowerbet__odd }}/{{ horse.paddypowerbet__probability }}
+                    {% endif %}
+                </td>
+                <td id="{{ horse.bet365bet__uniid }}">
+                    {% if horse.bet365bet__odd %}
+                        {{ horse.bet365bet__odd }}/{{ horse.bet365bet__probability }}
+                    {% endif %}
+                </td>
             </tr>
         {% endfor %}
         </tbody>
+    </table>
 {% endblock %}
+
 {% block js %}
     <script type="application/javascript">
-        $(document).ready(function () {
+        var socket = new WebSocket('ws://' + window.location.host + '/odds/');
 
-        });
+        socket.onopen = function open() {
+          console.log('WebSockets connection were created.');
+        };
+
+        socket.onmessage = function message(event) {
+            var data = JSON.parse(event.data);
+            var odd_probability = ''+data.odd+'/'+data.probability+'';
+            $(document.getElementById(data.uniid)).html(odd_probability);
+        };
+
+        if (socket.readyState == WebSocket.OPEN) {
+          socket.onopen();
+        }
     </script>
 {% endblock %}

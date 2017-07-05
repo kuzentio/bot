@@ -3,3 +3,4 @@
 *.sqlite3
 /static
 /node_modules
+*/local_settings.py

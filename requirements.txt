@@ -1,4 +1,7 @@
 Django==1.11.2
 django-extensions==1.8.0
+requests==2.18.1
 beautifulsoup4==4.6.0
 django-prettyjson==0.3.0
+channels==1.1.6
+asgi-redis==1.4.2
