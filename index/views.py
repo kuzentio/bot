@@ -13,6 +13,7 @@ def index(request, race_id):
         'name',
         'paddypowerbet__uniid', 'paddypowerbet__odd', 'paddypowerbet__probability',
         'williamhillbet__uniid', 'williamhillbet__odd', 'williamhillbet__probability',
+        'skybet__uniid', 'skybet__odd', 'skybet__probability',
         'bet365bet__uniid', 'bet365bet__odd', 'bet365bet__probability',
     )
     context = {

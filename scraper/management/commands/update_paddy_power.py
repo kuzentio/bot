@@ -39,6 +39,7 @@ class Command(BaseCommand):
         race_regexp = r'(\[.*?\])'
         races_data = re.findall(race_regexp, parameters)
         horses = json.loads(races_data[0])
+        horse_in_race__ids = []
         for horse_in_race in horses:
             horse_name = horse_in_race['horse_names'].get('en')
             if horse_name is None:
@@ -52,4 +53,10 @@ class Command(BaseCommand):
                     'probability': horse_in_race.get('has_rp'),
                 }
             )
+            horse_in_race__ids.append(horse.id)
+
+        for horse in PaddyPowerBet.objects.filter(race=race).exclude(horse__id__in=horse_in_race__ids):
+            horse.deactivate_adds()
+            horse.save()
+
         logger.info("Done.")

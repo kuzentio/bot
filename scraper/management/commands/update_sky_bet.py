@@ -1,10 +1,12 @@
+import json
 import logging
-from bs4 import BeautifulSoup
+import re
 
+from bs4 import BeautifulSoup
 from django.core.management import BaseCommand
 import requests
 
-from scraper.models import Horse, WilliamHillBet, Race
+from scraper.models import PaddyPowerBet, Race, Horse, SkyBet
 
 log = logging.basicConfig(
     level=logging.INFO,
@@ -13,21 +15,22 @@ log = logging.basicConfig(
 )
 logger = logging.getLogger(log)
 
-URL = 'http://sports.williamhill.com/bet/en-gb/betting/e/11127481/ap/{event_id}'
 
+def execute_horse_name(tr):
+    horse_name_txt = tr.find('div', {'class': 'oc-horse'}).find('h4').text
+    horse_name_list = re.sub(' +', ' ', horse_name_txt).split(' ')
+    horse_name_clean_list = horse_name_list[1:len(horse_name_list) - 1]
+    horse_name = ''.join(horse_name_clean_list)
 
-def get_horse_name_from_row(row):
-    text = row.find('td').text
-    result = [el for el in text.split() if el not in ['View', 'Tips']]
-    horse_name = ' '.join(result).encode('utf-8')
     return horse_name
 
 
-def get_horse_odd_from_row(row):
-    text = row.find_all('a')[1].text
-    odds, probability = text.split()[0].split('/')
+def execute_horse_odd(tr):
+    odd_element = tr.find('td', {'class': 'win'})
+    odd = int(odd_element.attrs['data-oc-num'])
+    probability = int(odd_element.attrs['data-oc-den'])
 
-    return odds, probability
+    return odd, probability
 
 
 class Command(BaseCommand):
@@ -46,26 +49,19 @@ class Command(BaseCommand):
         except Race.DoesNotExist:
             logger.info("provide existing race id")
             return
-        template_name = race.william_hill_data['template_name']
-        event_id = race.william_hill_data['event_id']
-        url = race.william_hill_data['url']
 
-        response = requests.get(url.format(
-            template_name=template_name,
-            event_id=event_id,
-        ))
+        url = 'https://www.skybet.com/horse-racing/newmarket/event/20915135'
+        response = requests.get(url)
         soup = BeautifulSoup(response.text, 'html.parser')
-        rows = soup.find("table").find("tbody").find_all("tr")
+        trs = soup.findAll('tr', {"id": lambda x: x and x.startswith('horseDetailControl')})
         horse_in_race__ids = []
-        for num, row in enumerate(rows):
-            if num == 0:
-                continue
-
-            horse_name = get_horse_name_from_row(row)
-            odd, probability = get_horse_odd_from_row(row)
-
+        if not trs:
+            raise Exception("Remote service is unavailable.")
+        for tr in trs:
+            horse_name = execute_horse_name(tr)
+            odd, probability = execute_horse_odd(tr)
             horse, _ = Horse.objects.get_or_create(name=horse_name)
-            _, _ = WilliamHillBet.objects.update_or_create(
+            _, _ = SkyBet.objects.update_or_create(
                 race=race,
                 horse=horse,
                 defaults={
@@ -74,7 +70,7 @@ class Command(BaseCommand):
                 }
             )
             horse_in_race__ids.append(horse.id)
-        for horse in WilliamHillBet.objects.filter(race=race).exclude(horse__id__in=horse_in_race__ids):
+        for horse in SkyBet.objects.filter(race=race).exclude(horse__id__in=horse_in_race__ids):
             horse.deactivate_adds()
             horse.save()
 

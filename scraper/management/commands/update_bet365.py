@@ -1,6 +1,6 @@
 import logging
 import re
-import urllib
+from urllib.parse import quote
 
 import requests
 from django.core.management import BaseCommand
@@ -35,8 +35,8 @@ class Command(BaseCommand):
         token = re.sub('/', '#', race.bet365_data['token'])
 
         url = race.bet365_data['url'].format(
-            token=urllib.quote(token),
+            token=quote(token),
         )
         response = requests.get(url)
-        horses = re.findall(r'OR=[^bet365]\B(.*?)SU', response.text)
+        horses = [horse for horse in response.text.split('|') if 'OD' in horse]
         # TODO: not closed issue because of technical maintain issue in bet365

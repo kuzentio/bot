@@ -8,6 +8,7 @@
                 <th>Horse Name</th>
                 <th>WilliamHill</th>
                 <th>PaddyPower</th>
+                <th>SkyBet</th>
                 <th>bet365</th>
             </tr>
         </thead>
@@ -23,6 +24,11 @@
                 <td id="{{ horse.paddypowerbet__uniid }}">
                     {% if horse.paddypowerbet__odd %}
                         {{ horse.paddypowerbet__odd }}/{{ horse.paddypowerbet__probability }}
+                    {% endif %}
+                </td>
+                <td id="{{ horse.skybet__uniid }}">
+                    {% if horse.skybet__odd %}
+                        {{ horse.skybet__odd }}/{{ horse.skybet__probability }}
                     {% endif %}
                 </td>
                 <td id="{{ horse.bet365bet__uniid }}">
