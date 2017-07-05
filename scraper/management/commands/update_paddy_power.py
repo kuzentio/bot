@@ -57,7 +57,7 @@ class Command(BaseCommand):
                 horse_in_race__ids.append(horse.id)
 
         for horse in PaddyPowerBet.objects.filter(race=race).exclude(horse__id__in=horse_in_race__ids):
-            horse.deactivate_adds()
+            horse.deactivate_odds()
             horse.save()
 
         logger.info("Done.")

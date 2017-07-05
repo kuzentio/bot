@@ -29,7 +29,7 @@ class OddsMixin(models.Model):
     odd = models.IntegerField(blank=True, null=True)
     probability = models.IntegerField(blank=True, null=True)
 
-    def deactivate_adds(self):
+    def deactivate_odds(self):
         self.odd = None
         self.probability = None
 
