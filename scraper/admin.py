@@ -11,7 +11,7 @@ class ProviderAdmin(admin.ModelAdmin):
                     'created', 'modified',
                     )
     ordering = ('id', )
-    readonly_fields = ('uniid', )
+    # readonly_fields = ('uniid', )
 
 
 class RaceAdmin(admin.ModelAdmin):

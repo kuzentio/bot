@@ -50,7 +50,9 @@ class Command(BaseCommand):
             logger.info("provide existing race id")
             return
 
-        url = 'https://www.skybet.com/horse-racing/newmarket/event/20915135'
+        url = race.sky_bet_data['url'].format(
+            event_id=race.sky_bet_data.get('event_id')
+        )
         response = requests.get(url)
         horse_in_race__ids = []
         if response.status_code == 200:
@@ -58,6 +60,7 @@ class Command(BaseCommand):
             trs = soup.findAll('tr', {"id": lambda x: x and x.startswith('horseDetailControl')})
             if not trs:
                 logger.info("Remote service is unavailable.")
+                return
             for tr in trs:
                 horse_name = execute_horse_name(tr)
                 odd, probability = execute_horse_odd(tr)
@@ -75,8 +78,12 @@ class Command(BaseCommand):
                     }
                 )
                 horse_in_race__ids.append(horse.id)
-        for horse in SkyBet.objects.filter(race=race).exclude(horse__id__in=horse_in_race__ids):
-            horse.deactivate_odds()
-            horse.save()
+            for horse in SkyBet.objects.filter(race=race).exclude(horse__id__in=horse_in_race__ids):
+                horse.deactivate_odds()
+                horse.save()
 
-        logger.info("Done.")
+            logger.info("Done.")
+            return
+        logger.info("Remote service is unavailable, response status code {}".format(response.status_code))
+        return
+

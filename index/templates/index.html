@@ -16,17 +16,17 @@
         {% for horse in horses %}
             <tr>
                 <td>{{ horse.name }}</td>
-                <td id="{{ horse.williamhillbet__uniid }}">
+                <td id="wh_{{ horse.id }}_{{ race.id }}">
                     {% if horse.williamhillbet__odd %}
                         {{ horse.williamhillbet__odd }}/{{ horse.williamhillbet__probability }}
                     {% endif %}
                 </td>
-                <td id="{{ horse.paddypowerbet__uniid }}">
+                <td id="pp_{{ horse.id }}_{{ race.id }}">
                     {% if horse.paddypowerbet__odd %}
                         {{ horse.paddypowerbet__odd }}/{{ horse.paddypowerbet__probability }}
                     {% endif %}
                 </td>
-                <td id="{{ horse.skybet__uniid }}">
+                <td id="sb_{{ horse.id }}_{{ race.id }}">
                     {% if horse.skybet__odd %}
                         {{ horse.skybet__odd }}/{{ horse.skybet__probability }}
                     {% endif %}
