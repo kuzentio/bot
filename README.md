@@ -2,7 +2,7 @@
 
 This is live dashboard which execute odds from providers, and shows odds/probability directly into dashboard.
 
-## Install
+## Getting Started
 
 From you python3 virtualenvironment run:
 
@@ -17,6 +17,7 @@ Then you need to load information about races from fixtures that I already prepa
 ```pythno manage.py loaddata fixtures.json```
 
 ## Update odds
+
 After that you can either update information from providers by running 
 
 ``` python manage.py update_providers --race_id <id for race, e.g. 1> ```
@@ -29,6 +30,7 @@ Example:
 this cron command will update odds from providers every 5 minutes.
 
 ## Prerequisites
+
 * For message exchanging in dashboard I use WebSockets, so you will see live updates if they any in database.
 * In fixtures I add two events, so you can test events execution by getting on index page, and add `race_id` to parameters e.g. `http://localhost:800/?race_id=2`
 * For SkyBet provider it is impossible to use local Ukrainian IP, so you have to use vpn for it.
