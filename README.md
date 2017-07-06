@@ -31,4 +31,5 @@ this cron command will update odds from providers every 5 minutes.
 ## Prerequisites
 * For message exchanging in dashboard I use WebSockets, so you will see live updates if they any in database.
 * In fixtures I add two events, so you can test events execution by getting on index page, and add `race_id` to parameters e.g. `http://localhost:800/?race_id=2`
-
+* For SkyBet provider it is impossible to use local Ukrainian IP, so you have to use vpn for it.
+* Scrapping for bet365 is not ended because I often had a problems with access to it.
