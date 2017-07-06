@@ -24,7 +24,7 @@ def get_horse_name_from_row(row):
 
 
 def get_horse_odd_from_row(row):
-    text = row.find_all('a')[1].text
+    text = row.find_all('a')[-1].text
     odds, probability = text.split()[0].split('/')
 
     return odds, probability
@@ -64,6 +64,8 @@ class Command(BaseCommand):
 
                 horse_name = get_horse_name_from_row(row)
                 odd, probability = get_horse_odd_from_row(row)
+                if odd is None or probability is None:
+                    continue
 
                 horse, _ = Horse.objects.get_or_create(name=horse_name)
 
