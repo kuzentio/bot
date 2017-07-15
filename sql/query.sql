@@ -1,67 +1,55 @@
-SELECT contests.contest_id, contests.hacker_id, contests.name,
-  IFNULL(submission_stat.total_submissions, 0) AS total_submissions,
-  IFNULL(submission_stat.total_accepted_submissions, 0) AS total_accepted_submissions,
-  IFNULL(total_views.total_views, 0) AS total_views,
-  IFNULL(total_views.total_unique_views, 0) AS total_unique_views
-FROM Contests contests
-  LEFT JOIN Colleges colleges
-    ON contests.contest_id = colleges.contest_id
-  LEFT JOIN Challenges challenges
-    ON challenges.college_id = colleges.college_id
+CREATE VIEW ContestView AS
+  SELECT
+    contests.contest_id,
+    contests.hacker_id,
+    contests.name,
+    challenge_id
+  FROM
+    Contests contests
+    LEFT JOIN Colleges colleges
+      ON contests.contest_id = colleges.contest_id
+    LEFT JOIN Challenges challenges
+      ON challenges.college_id = colleges.college_id;
 
-  LEFT JOIN (
-    SELECT
-      DISTINCT
-      contest.contest_id,
-      SUM(view_stat.total_views) total_views,
-      SUM(view_stat.total_unique_views) total_unique_views
-    FROM View_Stats view_stat
-      LEFT JOIN Challenges challenges
-        ON challenges.challenge_id = view_stat.challenge_id
-      LEFT JOIN Colleges collages
-        ON collages.college_id = challenges.college_id
-      LEFT JOIN Contests contest
-        ON contest.contest_id = collages.contest_id
+SELECT
+  contest_view.contest_id,
+  contest_view.hacker_id,
+  contest_view.name,
+  IFNULL(submissions_stat.total_submission, 0) total_submissions,
+  IFNULL(submissions_stat.total_accepted_submission, 0) total_accepted_submissions,
+  IFNULL(view_stats.total_view, 0) total_views,
+  IFNULL(view_stats.total_unique_view, 0) total_unique_views
 
-      GROUP BY
-        contest.contest_id
+FROM ContestView contest_view
+  JOIN (
+      SELECT
+        contest_id,
+        SUM(total_views) total_view,
+        SUM(total_unique_views) total_unique_view
+      FROM ContestView contest_view
 
-    ) AS total_views
-    ON contests.contest_id = total_views.contest_id
+        LEFT JOIN View_Stats view_stats
+          ON view_stats.challenge_id = contest_view.challenge_id
+      GROUP BY contest_view.contest_id
+    ) view_stats
+  ON
+    view_stats.contest_id = contest_view.contest_id
+  JOIN (
+      SELECT
+        contest_id,
+        SUM(total_submissions) total_submission,
+        SUM(total_accepted_submission) total_accepted_submission
+      FROM ContestView contest_view
+          LEFT JOIN Submission_Stats submission_stats
+            ON submission_stats.challenge_id = contest_view.challenge_id
 
-  LEFT JOIN (
-    SELECT
-      DISTINCT
-      contest.contest_id,
-      IFNULL(SUM(sub_stat.total_submissions), 0) total_submissions,
-      IFNULL(SUM(sub_stat.total_accepted_submission), 0) total_accepted_submissions
-    FROM Submission_Stats sub_stat
-      LEFT JOIN Challenges challenges
-        ON challenges.challenge_id = sub_stat.challenge_id
-      LEFT JOIN Colleges collages
-        ON collages.college_id = challenges.college_id
-      LEFT JOIN Contests contest
-        ON contest.contest_id = collages.contest_id
+        GROUP BY contest_view.contest_id
+    ) submissions_stat
+  ON
+    submissions_stat.contest_id = contest_view.contest_id
+GROUP BY contest_view.contest_id
 
-      GROUP BY contest.contest_id
-
-    ) AS submission_stat
-    ON contests.contest_id = submission_stat.contest_id
-
-GROUP BY
-  contests.contest_id,
-  submission_stat.total_submissions,
-  submission_stat.total_accepted_submissions,
-  total_views.total_views,
-  total_views.total_unique_views
 HAVING (
-  IFNULL(total_submissions, 0) +
-  IFNULL(total_accepted_submissions, 0) +
-  IFNULL(total_views, 0) +
-  IFNULL(total_unique_views, 0) > 0
+  total_submissions + total_accepted_submissions + total_views + total_unique_views > 0
 )
-
-ORDER BY contests.contest_id
-
-
 
